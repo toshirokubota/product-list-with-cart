@@ -52,52 +52,100 @@
   var desserts;
   initialize();
 
-  const updateCount = (dessert, k)=> {
-    dessert.count += k;
-  }
   const incrementCount = (dessert)=> {
-    updateCount(dessert, 1);
+    dessert.count += 1;
+    console.log('incrementing' + dessert.name + 'to ' + dessert.count);
+    if(dessert.count == 1) {
+      dessert.node.button_empty.style.display = 'none';
+      dessert.node.button_nonempty.style.display = 'flex';
+      dessert.node.photo.style.border = 'solid 1px hsl(14, 86%, 42%)';
+      console.log('switch buttons');
+    }
+    dessert.num.innerText = '' + dessert.count;
   }
   const decrementCount = (dessert)=> {
-    updateCount(dessert, -1);
-  }
-  const handleAddButton = (dessert) => {
-    const button = dessert.button;
+    dessert.count -= 1;
+    console.log('incrementing' + dessert.name + 'to ' + dessert.count);
     if(dessert.count == 0) {
-      button.classList.add('add-to-cart');
-      let icon = document.createElement('img');
-      icon.classList.add('empty-icon');
-      icon.src = './assets/images/icon-add-to-cart.svg';
-      icon.addEventListener('click', (e)=> { incrementCount(dessert)});
-      button.appendChild(document.createTextNode('Add to Cart'));
-      button.appendChild(icon);
-    } else {
-      button.classList.add('update-cart');
-      let icon = document.createElement('img');
-      icon.src = './assets/images/icon-increment-quantity.svg';
-      icon.classList.add('increment-icon');
-      icon.addEventListener('click', (e)=> { incrementCount(dessert)});
-      button.appendChild(icon);
-
-      let num = document.createElement('span');     
-      num.classList.add('count-num');
-      num.appendChild(document.createTextNode('' + dessert.count));
-      button.appendChild(num);
-
-      let icon2 = document.createElement('img');
-      icon2.src = './assets/images/icon-decrement-quantity.svg';
-      icon2.classList.add('decrement-icon');
-      icon2.addEventListener('click', (e)=> { decrementCount(dessert)});
-      button.appendChild(icon2);
+      dessert.node.button_empty.style.display = 'flex';
+      dessert.node.button_nonempty.style.display = 'none';
+      dessert.node.photo.style.border = 'none';
+      console.log('switch buttons');
     }
-    return button;
+    dessert.num.innerText = '' + dessert.count;
   }
+
+  const buttonWhenEmpty = (dessert) => {
+    const box = document.createElement('div');
+    box.classList.add('button-empty-container')
+    let icon = document.createElement('img');
+    icon.classList.add('empty-icon');
+    icon.src = './assets/images/icon-add-to-cart.svg';
+    icon.addEventListener('click', (e)=> { incrementCount(dessert)});
+    box.appendChild(document.createTextNode('Add to Cart'));
+    box.appendChild(icon);
+    return box;
+  }
+  const buttonWhenNotEmpty = (dessert) => {
+    const box = document.createElement('div');
+    box.classList.add('button-nonempty-container')
+    let icon = document.createElement('img');
+    icon.src = './assets/images/icon-increment-quantity.svg';
+    icon.classList.add('increment-icon');
+    icon.addEventListener('click', (e)=> { incrementCount(dessert)});
+    box.appendChild(icon);
+
+    let num = document.createElement('span');     
+    num.classList.add('count-num');
+    num.appendChild(document.createTextNode('' + dessert.count));
+    box.appendChild(num);
+    dessert.num = num; //I am not sure if I want to do this way for updating the count
+
+    let icon2 = document.createElement('img');
+    icon2.src = './assets/images/icon-decrement-quantity.svg';
+    icon2.classList.add('decrement-icon');
+    icon2.addEventListener('click', (e)=> { decrementCount(dessert)});
+    box.appendChild(icon2);
+    return box;
+  }
+
+  // const handleAddButton = (dessert) => {
+  //   const button = dessert.button;
+  //   if(dessert.count == 0) {
+  //     button.classList.add('add-to-cart');
+  //     let icon = document.createElement('img');
+  //     icon.classList.add('empty-icon');
+  //     icon.src = './assets/images/icon-add-to-cart.svg';
+  //     icon.addEventListener('click', (e)=> { incrementCount(dessert)});
+  //     button.appendChild(document.createTextNode('Add to Cart'));
+  //     button.appendChild(icon);
+  //   } else {
+  //     button.classList.add('update-cart');
+  //     let icon = document.createElement('img');
+  //     icon.src = './assets/images/icon-increment-quantity.svg';
+  //     icon.classList.add('increment-icon');
+  //     icon.addEventListener('click', (e)=> { incrementCount(dessert)});
+  //     button.appendChild(icon);
+
+  //     let num = document.createElement('span');     
+  //     num.classList.add('count-num');
+  //     num.appendChild(document.createTextNode('' + dessert.count));
+  //     button.appendChild(num);
+
+  //     let icon2 = document.createElement('img');
+  //     icon2.src = './assets/images/icon-decrement-quantity.svg';
+  //     icon2.classList.add('decrement-icon');
+  //     icon2.addEventListener('click', (e)=> { decrementCount(dessert)});
+  //     button.appendChild(icon2);
+  //   }
+  //   return button;
+  // }
 
   async function initialize() {
     desserts = await getData();
     console.log(desserts);
     for(let dessert of desserts) {
-      dessert.count = 2;
+      dessert.count = 0;
     }
     let main = document.getElementById('dessert-menu');
     for(let dessert of desserts) {
@@ -153,16 +201,19 @@
 
       // add.appendChild(document.createTextNode('Add to Cart'));
       
-      let button = document.createElement('div');
-      dessert.button = button;
-      
-      handleAddButton(dessert)
-      item.appendChild(button);
+      let box = document.createElement('div');
+      box.classList.add('cart-updator');
+      let button1 = buttonWhenEmpty(dessert);
+      let button2 = buttonWhenNotEmpty(dessert);
+      button1.style.display = 'flex';
+      button2.style.display = 'none';
+      box.appendChild(button1);
+      box.appendChild(button2);
+      item.appendChild(box);
 
       main.appendChild(item);
-      //doubly associate to faciliate GUI update
-      dessert.node = item;
-      item.dessert = dessert;
+      //add DOM elements to facilitate visual update
+      dessert.node = { button_empty: button1, button_nonempty: button2, box: box, photo: img};
     }
   }
 

@@ -55,7 +55,40 @@ main {
 .dessert-photo img {
     width: 100%;
 }
-.add-to-cart {
+.cart-updator {
+    width: 50%;
+    margin: auto;
+    position: relative;
+    text-align: center;
+    border: solid 1px hsl(12, 20%, 44%);
+    border-radius: 1.25em;
+    top: -6.75em;
+    overflow: hidden
+}
+.button-empty-container, .button-nonempty-container {
+    width: 100%;
+    padding: 0.5em 1em;
+    display: flex;
+    justify-content: space-between;
+}
+.button-empty-container {
+    background-color: white;
+}
+.button-empty-container img {
+    vertical-align: middle;
+    padding-right: 1em;
+}
+.button-nonempty-container {
+    background-color: hsl(14, 86%, 42%);
+}
+.button-nonempty-container img {
+    vertical-align: middle;
+    padding-right: 1em;
+}
+.count-num {
+    color: white;
+}
+/* .add-to-cart {
     width: 50%;
     margin: auto;
     position: relative;
@@ -64,12 +97,11 @@ main {
     border: solid 1px hsl(12, 20%, 44%);
     border-radius: 1.25em;
     top: -6.75em;
-    background-color: white;
 }
 .add-to-cart img {
     vertical-align: middle;
     padding-right: 1em;
-}
+} */
 
 .update-cart {
     color: white;
