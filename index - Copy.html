@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- displays site properly based on user's device -->
+
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
+
+  <title>Frontend Mentor | Product list with cart</title>
+
+  <!-- Feel free to remove these styles or customise in your own stylesheet 👍 -->
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .attribution {
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .attribution a {
+      color: hsl(228, 45%, 44%);
+    }
+  </style>
+</head>
+
+<body>
+  <h1>
+    Desserts
+  </h1>
+  <main>
+    <div class="item">
+      <div class="item-photo"></div>
+      <h2>
+        Waffle with Berries
+      </h2>
+      <h3>
+        Waffle
+      </h3>
+      <div class="price">
+        6.50
+      </div>
+      <div class="add-to-cart">
+        Add to Cart
+      </div>
+    </div>
+
+    <div class="item">
+      <div class="item-photo"></div>
+      <h2>
+        Vanilla Bean Crème Brûlée
+      </h2>
+      <h3>
+        Crème Brûlée
+      </h3>
+      <div class="price">
+        7.00
+      </div>
+      <div class="add-to-cart">
+        Add to Cart
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-photo"></div>
+      <h2>
+        Macaron Mix of Five
+      </h2>
+      <h3>
+        Macaron
+      </h3>
+      <div class="price">
+        8.00
+      </div>
+      <div class="add-to-cart">
+        Add to Cart
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-photo"></div>
+      <h2>
+        Classic Tiramisu
+      </h2>
+      <h3>
+        Tiramisu
+      </h3>
+      <div class="price">
+        5.50
+      </div>
+      <div class="add-to-cart">
+        Add to Cart
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-photo"></div>
+      <h2>
+        Pistachio Baklava
+      </h2>
+      <h3>
+        Baklava
+      </h3>
+      <div class="price">
+        4.00
+      </div>
+      <div class="add-to-cart">
+        Add to Cart
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-photo"></div>
+      <h2>
+        Lemon Meringue Pie
+      </h2>
+      <h3>
+        Pie
+      </h3>
+      <div class="price">
+        5.00
+      </div>
+      <div class="add-to-cart">
+        Add to Cart
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-photo"></div>
+      <h2>
+        Red Velvet Cake
+      </h2>
+      <h3>
+        Cake
+      </h3>
+      <div class="price">
+        4.50
+      </div>
+      <div class="add-to-cart">
+        Add to Cart
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-photo"></div>
+      <h2>
+        Salted Caramel Brownie
+      </h2>
+      <h3>
+        Brownie
+      </h3>
+      <div class="price">
+        4.50
+      </div>
+      <div class="add-to-cart">
+        Add to Cart
+      </div>
+    </div>
+    <div class="item">
+      <div class="item-photo"></div>
+      <h2>
+        Vanilla Panna Cotta
+      </h2>
+      <h3>
+        Panna Cotta
+      </h3>
+      <div class="price">
+        6.50
+      </div>
+      <div class="add-to-cart">
+        Add to Cart
+      </div>
+    </div>
+    <h4>
+      Your Cart (<span class="quantity"><!-- Quantity --></span>)
+    </h4>
+    <div class="added-items">
+      Your added items will appear here
+    </div>
+  </main>
+
+  <div class="attribution">
+    Challenge by <a href="https://www.frontendmentor.io?ref=challenge">Frontend Mentor</a>.
+    Coded by <a href="#">Your Name Here</a>.
+  </div>
+</body>
+
+<script>
+  populate();
+
+  async function populate() {
+    const items = await getData();
+    console.log(items);
+  }
+
+  async function getData() {
+    const res = await fetch('./data.json');
+    const data = await res.json();
+
+    return data;
+  }
+</script>
+
+</html>

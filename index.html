@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- displays site properly based on user's device -->
+
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
+
+  <title>Frontend Mentor | Product list with cart</title>
+
+  <!-- Feel free to remove these styles or customise in your own stylesheet 👍 -->
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .attribution {
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .attribution a {
+      color: hsl(228, 45%, 44%);
+    }
+  </style>
+</head>
+
+<body>
+  <h1>
+    Desserts
+  </h1>
+  <main>
+    <div id="dessert-menu">
+    </div>
+    <div id="cart-area">
+      <h4 id="cart-summary">
+        Your Cart (<span class="quantity"><!-- Quantity --></span>)
+      </h4>
+      <div class="added-items">
+        <img src="./assets/images/illustration-empty-cart.svg"/>
+        Your added items will appear here
+      </div>  
+    </div>
+  </main>
+
+  <div class="attribution">
+    Challenge by <a href="https://www.frontendmentor.io?ref=challenge">Frontend Mentor</a>.
+    Coded by <a href="#">Your Name Here</a>.
+  </div>
+</body>
+
+<script>
+  var desserts;
+  initialize();
+
+  const updateCount = (dessert, k)=> {
+    dessert.count += k;
+  }
+  const incrementCount = (dessert)=> {
+    updateCount(dessert, 1);
+  }
+  const decrementCount = (dessert)=> {
+    updateCount(dessert, -1);
+  }
+  const handleAddButton = (dessert) => {
+    const button = dessert.button;
+    if(dessert.count == 0) {
+      button.classList.add('add-to-cart');
+      let icon = document.createElement('img');
+      icon.classList.add('empty-icon');
+      icon.src = './assets/images/icon-add-to-cart.svg';
+      icon.addEventListener('click', (e)=> { incrementCount(dessert)});
+      button.appendChild(document.createTextNode('Add to Cart'));
+      button.appendChild(icon);
+    } else {
+      button.classList.add('update-cart');
+      let icon = document.createElement('img');
+      icon.src = './assets/images/icon-increment-quantity.svg';
+      icon.classList.add('increment-icon');
+      icon.addEventListener('click', (e)=> { incrementCount(dessert)});
+      button.appendChild(icon);
+
+      let num = document.createElement('span');     
+      num.classList.add('count-num');
+      num.appendChild(document.createTextNode('' + dessert.count));
+      button.appendChild(num);
+
+      let icon2 = document.createElement('img');
+      icon2.src = './assets/images/icon-decrement-quantity.svg';
+      icon2.classList.add('decrement-icon');
+      icon2.addEventListener('click', (e)=> { decrementCount(dessert)});
+      button.appendChild(icon2);
+    }
+    return button;
+  }
+
+  async function initialize() {
+    desserts = await getData();
+    console.log(desserts);
+    for(let dessert of desserts) {
+      dessert.count = 2;
+    }
+    let main = document.getElementById('dessert-menu');
+    for(let dessert of desserts) {
+      let item = document.createElement('div');
+      item.classList.add('dessert-item');
+      //add photo
+      let photo = document.createElement('div');
+      photo.classList.add('dessert-photo');
+      let img = document.createElement('img');
+      //add thumb nail photo based on the screen size
+      if(window.innerWidth <= 450) img.src = dessert.image.mobile;
+      else if(window.innerWidth < 1024) img.src = dessert.image.tablet;
+      else img.src = dessert.image.desktop;
+      photo.appendChild(img);
+      item.appendChild(photo);
+
+      //add category
+      let category = document.createElement('h3');
+      category.classList.add('dessert-category');
+      category.appendChild(document.createTextNode(dessert.category));
+      item.appendChild(category);
+      //add name 
+      let name = document.createElement('h2');
+      name.appendChild(document.createTextNode(dessert.name));
+      name.classList.add('dessert-name');
+      item.appendChild(name);
+      //add price
+      let price = document.createElement('div');
+      price.classList.add('dessert-price');
+      price.appendChild(document.createTextNode('$' + parseFloat(dessert.price).toFixed(2)));
+      item.appendChild(price);
+      //add button
+      // let add = document.createElement('div');
+      // add.classList.add('add-to-cart');
+      // let icon = document.createElement('img');
+      // icon.src = './assets/images/icon-add-to-cart.svg';
+      // add.appendChild(icon);
+      // add.addEventListener('click', (e)=> {
+      //   //get the name of the dessert
+      //   console.log('onclick listener: ', e);
+      //     const parent = e.srcElement.parentNode;
+      //     if (parent) {
+      //       const children = Array.from(parent.children);
+      //       children.forEach(elm => {
+      //         for (const className of elm.classList) {
+      //           if(className == 'dessert-name') {
+      //             console.log(elm);
+      //           }
+      //         }              
+      //         });
+      //     }
+      //   });
+
+      // add.appendChild(document.createTextNode('Add to Cart'));
+      
+      let button = document.createElement('div');
+      dessert.button = button;
+      
+      handleAddButton(dessert)
+      item.appendChild(button);
+
+      main.appendChild(item);
+      //doubly associate to faciliate GUI update
+      dessert.node = item;
+      item.dessert = dessert;
+    }
+  }
+
+  async function getData() {
+    const res = await fetch('./data.json');
+    const data = await res.json();
+
+    return data;
+  }
+</script>
+
+</html>

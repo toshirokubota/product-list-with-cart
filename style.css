@@ -1,0 +1,95 @@
+@font-face {
+    font-family: RedHatText;
+    src: url("./assets/fonts/RedHatText-VariableFont_wght.ttf");
+}
+
+@font-face {
+    font-family: RedHatTextItalic;
+    src: url("./assets/fonts/RedHatText-Italic-VariableFont_wght.ttf");
+}
+
+:root {
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+*,
+::before,
+::after {
+    box-sizing: inherit;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: RedHatText;
+}
+
+main {
+    display: flex;
+    flex-direction: column;
+}
+
+#dessert-menu {
+    flex: 1;
+}
+#cart-area {
+    flex: 1;
+}
+.dessert-item {
+    padding: 1em;
+}
+.dessert-name {
+    font-size: 1em; 
+}
+.dessert-category {
+    margin-top: 2em;
+    font-size: 0.8em;
+    color: hsl(12, 20%, 44%); 
+}
+.dessert-price {
+    color: hsl(14, 86%, 42%);
+    font-size: 1em;
+}
+
+.dessert-photo img {
+    width: 100%;
+}
+.add-to-cart {
+    width: 50%;
+    margin: auto;
+    position: relative;
+    text-align: center;
+    padding: 0.5em 1em;
+    border: solid 1px hsl(12, 20%, 44%);
+    border-radius: 1.25em;
+    top: -6.75em;
+    background-color: white;
+}
+.add-to-cart img {
+    vertical-align: middle;
+    padding-right: 1em;
+}
+
+.update-cart {
+    color: white;
+    width: 50%;
+    margin: auto;
+    position: relative;
+    text-align: center;
+    padding: 0.5em 1em;
+    border: solid 1px hsl(12, 20%, 44%);
+    border-radius: 1.25em;
+    top: -6.75em;
+    background-color: hsl(14, 86%, 42%);
+}
+.update-cart img {
+    vertical-align: middle;
+    padding-right: 1em;
+    width: 1em;
+    height: 1em;
+}
+
+.cart-area {
+    align-self: center;
+}
