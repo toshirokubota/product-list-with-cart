@@ -32,13 +32,40 @@
     <div id="dessert-menu">
     </div>
     <div id="cart-area">
-      <h4 id="cart-summary">
-        Your Cart (<span class="quantity"><!-- Quantity --></span>)
-      </h4>
-      <div class="added-items">
-        <img src="./assets/images/illustration-empty-cart.svg"/>
-        Your added items will appear here
-      </div>  
+      <div id="cart-box">
+        <h4 id="cart-summary">
+          Your Cart (<span class="order-total-count"></span>)
+        </h4>
+        <!-- <div id="added-items">
+          <img src="./assets/images/illustration-empty-cart.svg"/>
+          Your added items will appear here
+        </div>     -->
+        <!-- <div class="cart-entry">
+          dessert name, count, price, total
+        </div> -->
+        <div class="order-entry">
+          <div class="order-entry-detail">
+            <div class="dessert-name">Waffle with Berries</div>
+            <div>
+              <span class="order-entry-count">1&times</span>
+              <span class="order-entry-price">@ $4.00</span>
+              <span class="order-entry-subtotal">$4.00</span>  
+            </div>
+          </div>
+          <div class="remove-item">
+            <img src="./assets/images/icon-remove-item.svg"/>
+          </div>
+        </div>
+        <div id="cart-cost-total">
+          <span>Order total</span>
+          <span id="order-total-dollar">$234.99</span>
+        </div>
+        <div class="carbon-neutral">
+          <img src="./assets/images/icon-carbon-neutral.svg"/>
+          This is a <emp>carbon-neutral</emp> delivery
+        </div>
+        <div class="comfirm-order-button">Confirm Order</div>
+      </div>
     </div>
   </main>
 
@@ -62,6 +89,7 @@
       console.log('switch buttons');
     }
     dessert.num.innerText = '' + dessert.count;
+    updateCart(desserts);
   }
   const decrementCount = (dessert)=> {
     dessert.count -= 1;
@@ -73,6 +101,7 @@
       console.log('switch buttons');
     }
     dessert.num.innerText = '' + dessert.count;
+    updateCart(desserts);
   }
 
   const buttonWhenEmpty = (dessert) => {
@@ -81,7 +110,7 @@
     let icon = document.createElement('img');
     icon.classList.add('empty-icon');
     icon.src = './assets/images/icon-add-to-cart.svg';
-    icon.addEventListener('click', (e)=> { incrementCount(dessert)});
+    box.addEventListener('click', (e)=> { incrementCount(dessert)});
     box.appendChild(document.createTextNode('Add to Cart'));
     box.appendChild(icon);
     return box;
@@ -109,37 +138,19 @@
     return box;
   }
 
-  // const handleAddButton = (dessert) => {
-  //   const button = dessert.button;
-  //   if(dessert.count == 0) {
-  //     button.classList.add('add-to-cart');
-  //     let icon = document.createElement('img');
-  //     icon.classList.add('empty-icon');
-  //     icon.src = './assets/images/icon-add-to-cart.svg';
-  //     icon.addEventListener('click', (e)=> { incrementCount(dessert)});
-  //     button.appendChild(document.createTextNode('Add to Cart'));
-  //     button.appendChild(icon);
-  //   } else {
-  //     button.classList.add('update-cart');
-  //     let icon = document.createElement('img');
-  //     icon.src = './assets/images/icon-increment-quantity.svg';
-  //     icon.classList.add('increment-icon');
-  //     icon.addEventListener('click', (e)=> { incrementCount(dessert)});
-  //     button.appendChild(icon);
+  const updateCart = (desserts) => {
+    let count = 0;
+    let total = 0;
+    for(let dessert of desserts) {
+      count += dessert.count;
+      total += dessert.count * dessert.price;
+      if(dessert.count > 0) {
 
-  //     let num = document.createElement('span');     
-  //     num.classList.add('count-num');
-  //     num.appendChild(document.createTextNode('' + dessert.count));
-  //     button.appendChild(num);
-
-  //     let icon2 = document.createElement('img');
-  //     icon2.src = './assets/images/icon-decrement-quantity.svg';
-  //     icon2.classList.add('decrement-icon');
-  //     icon2.addEventListener('click', (e)=> { decrementCount(dessert)});
-  //     button.appendChild(icon2);
-  //   }
-  //   return button;
-  // }
+      }
+    }
+    let summary = document.getElementById('cart-summary');
+    summary.innerHTML = 'Your Cart (<span class="quantity">' + count + '</span>)';
+  }
 
   async function initialize() {
     desserts = await getData();
@@ -178,29 +189,6 @@
       price.appendChild(document.createTextNode('$' + parseFloat(dessert.price).toFixed(2)));
       item.appendChild(price);
       //add button
-      // let add = document.createElement('div');
-      // add.classList.add('add-to-cart');
-      // let icon = document.createElement('img');
-      // icon.src = './assets/images/icon-add-to-cart.svg';
-      // add.appendChild(icon);
-      // add.addEventListener('click', (e)=> {
-      //   //get the name of the dessert
-      //   console.log('onclick listener: ', e);
-      //     const parent = e.srcElement.parentNode;
-      //     if (parent) {
-      //       const children = Array.from(parent.children);
-      //       children.forEach(elm => {
-      //         for (const className of elm.classList) {
-      //           if(className == 'dessert-name') {
-      //             console.log(elm);
-      //           }
-      //         }              
-      //         });
-      //     }
-      //   });
-
-      // add.appendChild(document.createTextNode('Add to Cart'));
-      
       let box = document.createElement('div');
       box.classList.add('cart-updator');
       let button1 = buttonWhenEmpty(dessert);
@@ -215,6 +203,34 @@
       //add DOM elements to facilitate visual update
       dessert.node = { button_empty: button1, button_nonempty: button2, box: box, photo: img};
     }
+  }
+
+  const initializeCart = (desserts) => {
+    let container = document.getElementById('cart-area');
+    let box = document.createElement('div');
+    box.id = 'cart-box';
+    container.appendChild(box);
+    let empty_cart = document.createElement('div');
+    empty_cart.innerHTML = `        
+        <h4 id="cart-summary">
+          Your Cart (<span class="quantity"><!-- Quantity --></span>)
+        </h4>
+        <div id="added-items">
+          <img src="./assets/images/illustration-empty-cart.svg"/>
+          Your added items will appear here
+        </div>    
+        `;
+    box.appendChild(empty_cart);
+
+    for(let dessert of desserts) {
+      let entry = document.createElement('div');
+      entry.classList.add('cart-entry');
+      entry.innerHTML = dessert.name + " x" + dessert.count + " $" + dessert.price + " $" + (dessert.count * dessert.price).toFixed(2);
+      entry.style.display = 'none';
+      box.appendChild(entry);
+      dessert.cart_entry = entry;
+    }
+
   }
 
   async function getData() {
