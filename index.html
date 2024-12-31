@@ -32,17 +32,19 @@
     <div id="dessert-menu">
     </div>
     <div id="cart-area">
-      <div id="cart-box">
-        <h4 id="cart-summary">
-          Your Cart (<span class="order-total-count"></span>)
+      <div id="empty-card">
+        <h4 class="cart-summary">
+          Your Cart (0)
         </h4>
-        <!-- <div id="added-items">
+        <div class="empty-cart-icon">
           <img src="./assets/images/illustration-empty-cart.svg"/>
           Your added items will appear here
-        </div>     -->
-        <!-- <div class="cart-entry">
-          dessert name, count, price, total
-        </div> -->
+        </div>    
+      </div>
+      <div id="selected-items-card">
+        <!-- <h4 class="cart-summary">
+          Your Cart (0)
+        </h4>
         <div class="order-entry">
           <div class="order-entry-detail">
             <div class="dessert-name">Waffle with Berries</div>
@@ -61,10 +63,10 @@
           <span id="order-total-dollar">$234.99</span>
         </div>
         <div class="carbon-neutral">
-          <img src="./assets/images/icon-carbon-neutral.svg"/>
+          <img src="./assets/images/icon-carbon-neutral.svg" alt="carbon neutral icon"/>
           This is a <emp>carbon-neutral</emp> delivery
         </div>
-        <div class="comfirm-order-button">Confirm Order</div>
+        <div class="comfirm-order-button">Confirm Order</div> -->
       </div>
     </div>
   </main>
@@ -79,28 +81,37 @@
   var desserts;
   initialize();
 
+  const cart = initializeCart(desserts);
+  const selectedItemsCard = document.getElementById('selected-items-card');
+  selectedItemsCard.appendChild(cart);
+  selectedItemsCard.style.display = 'none';
+
   const incrementCount = (dessert)=> {
     dessert.count += 1;
-    console.log('incrementing' + dessert.name + 'to ' + dessert.count);
-    if(dessert.count == 1) {
-      dessert.node.button_empty.style.display = 'none';
-      dessert.node.button_nonempty.style.display = 'flex';
-      dessert.node.photo.style.border = 'solid 1px hsl(14, 86%, 42%)';
-      console.log('switch buttons');
-    }
-    dessert.num.innerText = '' + dessert.count;
+    dessert.dirty = true;
+    // console.log('incrementing' + dessert.name + 'to ' + dessert.count);
+    // if(dessert.count == 1) {
+    //   dessert.node.button_empty.style.display = 'none';
+    //   dessert.node.button_nonempty.style.display = 'flex';
+    //   dessert.node.photo.style.border = 'solid 1px hsl(14, 86%, 42%)';
+    //   console.log('switch buttons');
+    // }
+    // dessert.num.innerText = '' + dessert.count;
+    updateMenu(dessert);
     updateCart(desserts);
   }
   const decrementCount = (dessert)=> {
     dessert.count -= 1;
-    console.log('incrementing' + dessert.name + 'to ' + dessert.count);
-    if(dessert.count == 0) {
-      dessert.node.button_empty.style.display = 'flex';
-      dessert.node.button_nonempty.style.display = 'none';
-      dessert.node.photo.style.border = 'none';
-      console.log('switch buttons');
-    }
-    dessert.num.innerText = '' + dessert.count;
+    dessert.dirty = true;
+    // console.log('incrementing' + dessert.name + 'to ' + dessert.count);
+    // if(dessert.count == 0) {
+    //   dessert.node.button_empty.style.display = 'flex';
+    //   dessert.node.button_nonempty.style.display = 'none';
+    //   dessert.node.photo.style.border = 'none';
+    //   console.log('switch buttons');
+    // }
+    // dessert.num.innerText = '' + dessert.count;
+    updateMenu(dessert);
     updateCart(desserts);
   }
 
@@ -138,18 +149,43 @@
     return box;
   }
 
+  const updateMenu = (dessert) => {
+    if(dessert.count > 0) {
+      dessert.node.button_empty.style.display = 'none';
+      dessert.node.button_nonempty.style.display = 'flex';
+      dessert.node.photo.style.border = 'solid 1px hsl(14, 86%, 42%)';
+    } else {
+      dessert.node.button_empty.style.display = 'flex';
+      dessert.node.button_nonempty.style.display = 'none';
+      dessert.node.photo.style.border = 'none';
+    }
+    dessert.num.innerText = '' + dessert.count;
+  }
   const updateCart = (desserts) => {
     let count = 0;
     let total = 0;
     for(let dessert of desserts) {
       count += dessert.count;
       total += dessert.count * dessert.price;
-      if(dessert.count > 0) {
-
+      if(dessert.dirty) {
+        dessert.cart_entry.innerHTML = populateEntry(dessert);
+        if(dessert.count > 0) {
+          dessert.cart_entry.style.display = 'block';
+        } else {
+          dessert.cart_entry.style.display = 'none';
+        }
+        dessert.dirty = false;
       }
     }
     let summary = document.getElementById('cart-summary');
-    summary.innerHTML = 'Your Cart (<span class="quantity">' + count + '</span>)';
+    summary.innerText = 'Your Cart (' + count + ')';
+    if(count == 0) {
+      document.getElementById('empty-card').style.display = 'none';
+      document.getElementById('selected-items-card').style.display = 'block';
+    } else {
+      document.getElementById('empty-cart').style.display = 'block';
+      document.getElementById('selected-items-card').style.display = 'none';
+    }
   }
 
   async function initialize() {
@@ -157,6 +193,7 @@
     console.log(desserts);
     for(let dessert of desserts) {
       dessert.count = 0;
+      dessert.dirty = false; //a flag indicating if redraw is needed on its cart entry
     }
     let main = document.getElementById('dessert-menu');
     for(let dessert of desserts) {
@@ -166,6 +203,7 @@
       let photo = document.createElement('div');
       photo.classList.add('dessert-photo');
       let img = document.createElement('img');
+      img.alt = 'picture of ' + dessert.name;
       //add thumb nail photo based on the screen size
       if(window.innerWidth <= 450) img.src = dessert.image.mobile;
       else if(window.innerWidth < 1024) img.src = dessert.image.tablet;
@@ -206,31 +244,71 @@
   }
 
   const initializeCart = (desserts) => {
-    let container = document.getElementById('cart-area');
+    //let container = document.getElementById('cart-area');
     let box = document.createElement('div');
-    box.id = 'cart-box';
-    container.appendChild(box);
-    let empty_cart = document.createElement('div');
-    empty_cart.innerHTML = `        
-        <h4 id="cart-summary">
-          Your Cart (<span class="quantity"><!-- Quantity --></span>)
-        </h4>
-        <div id="added-items">
-          <img src="./assets/images/illustration-empty-cart.svg"/>
-          Your added items will appear here
-        </div>    
-        `;
-    box.appendChild(empty_cart);
+    box.classList.add('cart-box');
 
     for(let dessert of desserts) {
       let entry = document.createElement('div');
       entry.classList.add('cart-entry');
       entry.innerHTML = dessert.name + " x" + dessert.count + " $" + dessert.price + " $" + (dessert.count * dessert.price).toFixed(2);
+      entry.innerHTML = populateEntry(dessert);
       entry.style.display = 'none';
       box.appendChild(entry);
       dessert.cart_entry = entry;
+      entry.dessert = dessert;
     }
 
+    const costTotal = document.createElement('div');
+    costTotal.innerHTML = `
+          <span>Order total</span>
+          <span id="order-total-dollar">$0.00</span>
+    `;
+    costTotal.classList.add('cart-cost-total');
+    box.appendChild(costTotal);
+
+    const carbonNeutral = document.createElement('div');
+    carbonNeutral.innerHTML = `
+          <img src="./assets/images/icon-carbon-neutral.svg" alt="carbon neutral icon"/>
+          This is a <emp>carbon-neutral</emp> delivery
+    `;
+    carbonNeutral.classList.add('carbon-neutral');
+    box.appendChild(carbonNeutral);
+
+    const button = document.createElement('div');
+    button.innerText = 'Confirm Order';
+    button.classList.add('comfirm-order-button');
+    box.appendChild(button);
+
+    return box;
+  }
+
+  const populateEntry = (dessert) => {
+      return 
+      `
+        <div class="order-entry">
+          <div class="order-entry-detail">
+            <div class="dessert-name">` + dssert.name + `</div>
+            <div>
+              <span class="order-entry-count">` + dessert.count + `&times</span>
+              <span class="order-entry-price">@ $` + dessert.price.toFixed(2) `</span>
+              <span class="order-entry-subtotal">$` + (dessert.count * dessert.price).toFixed(2)`</span>  
+            </div>
+          </div>
+          <div class="remove-item" click="removeEntry(event)">
+            <img src="./assets/images/icon-remove-item.svg"/>
+          </div>
+        </div>
+      `;
+  }
+
+  const removeEntry = (e) => {
+    console.log(e);
+    const dessert = e.srcNode.dessert;
+    dessert.count = 0;
+    dessert.dirty = true;
+    updateMenue(dessert);
+    updateCart(desserts);
   }
 
   async function getData() {
