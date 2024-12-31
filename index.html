@@ -32,41 +32,16 @@
     <div id="dessert-menu">
     </div>
     <div id="cart-area">
+      <h4 id="cart-summary">
+        Your Cart (0)
+      </h4>
       <div id="empty-card">
-        <h4 class="cart-summary">
-          Your Cart (0)
-        </h4>
         <div class="empty-cart-icon">
           <img src="./assets/images/illustration-empty-cart.svg"/>
           Your added items will appear here
         </div>    
       </div>
       <div id="selected-items-card">
-        <!-- <h4 class="cart-summary">
-          Your Cart (0)
-        </h4>
-        <div class="order-entry">
-          <div class="order-entry-detail">
-            <div class="dessert-name">Waffle with Berries</div>
-            <div>
-              <span class="order-entry-count">1&times</span>
-              <span class="order-entry-price">@ $4.00</span>
-              <span class="order-entry-subtotal">$4.00</span>  
-            </div>
-          </div>
-          <div class="remove-item">
-            <img src="./assets/images/icon-remove-item.svg"/>
-          </div>
-        </div>
-        <div id="cart-cost-total">
-          <span>Order total</span>
-          <span id="order-total-dollar">$234.99</span>
-        </div>
-        <div class="carbon-neutral">
-          <img src="./assets/images/icon-carbon-neutral.svg" alt="carbon neutral icon"/>
-          This is a <emp>carbon-neutral</emp> delivery
-        </div>
-        <div class="comfirm-order-button">Confirm Order</div> -->
       </div>
     </div>
   </main>
@@ -81,36 +56,15 @@
   var desserts;
   initialize();
 
-  const cart = initializeCart(desserts);
-  const selectedItemsCard = document.getElementById('selected-items-card');
-  selectedItemsCard.appendChild(cart);
-  selectedItemsCard.style.display = 'none';
-
   const incrementCount = (dessert)=> {
     dessert.count += 1;
     dessert.dirty = true;
-    // console.log('incrementing' + dessert.name + 'to ' + dessert.count);
-    // if(dessert.count == 1) {
-    //   dessert.node.button_empty.style.display = 'none';
-    //   dessert.node.button_nonempty.style.display = 'flex';
-    //   dessert.node.photo.style.border = 'solid 1px hsl(14, 86%, 42%)';
-    //   console.log('switch buttons');
-    // }
-    // dessert.num.innerText = '' + dessert.count;
     updateMenu(dessert);
     updateCart(desserts);
   }
   const decrementCount = (dessert)=> {
     dessert.count -= 1;
     dessert.dirty = true;
-    // console.log('incrementing' + dessert.name + 'to ' + dessert.count);
-    // if(dessert.count == 0) {
-    //   dessert.node.button_empty.style.display = 'flex';
-    //   dessert.node.button_nonempty.style.display = 'none';
-    //   dessert.node.photo.style.border = 'none';
-    //   console.log('switch buttons');
-    // }
-    // dessert.num.innerText = '' + dessert.count;
     updateMenu(dessert);
     updateCart(desserts);
   }
@@ -168,23 +122,25 @@
       count += dessert.count;
       total += dessert.count * dessert.price;
       if(dessert.dirty) {
-        dessert.cart_entry.innerHTML = populateEntry(dessert);
+        dessert.order_entry_detail.innerHTML = populateEntryDetail(dessert);
         if(dessert.count > 0) {
-          dessert.cart_entry.style.display = 'block';
+          dessert.order_entry.style.display = 'block';
         } else {
-          dessert.cart_entry.style.display = 'none';
+          dessert.order_entry.style.display = 'none';
         }
         dessert.dirty = false;
       }
     }
+    let totalDollar = document.getElementById('order-total-dollar');
+    totalDollar.innerText = '$' + total.toFixed(2);
     let summary = document.getElementById('cart-summary');
     summary.innerText = 'Your Cart (' + count + ')';
     if(count == 0) {
+      document.getElementById('empty-card').style.display = 'block';
+      document.getElementById('selected-items-card').style.display = 'none';
+    } else {
       document.getElementById('empty-card').style.display = 'none';
       document.getElementById('selected-items-card').style.display = 'block';
-    } else {
-      document.getElementById('empty-cart').style.display = 'block';
-      document.getElementById('selected-items-card').style.display = 'none';
     }
   }
 
@@ -241,6 +197,12 @@
       //add DOM elements to facilitate visual update
       dessert.node = { button_empty: button1, button_nonempty: button2, box: box, photo: img};
     }
+
+    const selectedItemsCard = document.getElementById('selected-items-card');
+    console.log(selectedItemsCard);
+    const cart = initializeCart(desserts);
+    selectedItemsCard.appendChild(cart);
+    selectedItemsCard.style.display = 'none';
   }
 
   const initializeCart = (desserts) => {
@@ -250,12 +212,24 @@
 
     for(let dessert of desserts) {
       let entry = document.createElement('div');
-      entry.classList.add('cart-entry');
-      entry.innerHTML = dessert.name + " x" + dessert.count + " $" + dessert.price + " $" + (dessert.count * dessert.price).toFixed(2);
-      entry.innerHTML = populateEntry(dessert);
+      entry.classList.add('order-entry');
       entry.style.display = 'none';
+
+      let detail = document.createElement('div');
+      detail.classList.add('order-entry-detail');
+      detail.innerHTML = populateEntryDetail(dessert);
+      entry.appendChild(detail);
+      let remove_item = document.createElement('div');
+      remove_item.classList.add('remove-item');
+      remove_item.addEventListener('click', ()=> {
+        removeEntry(dessert);
+      });
+      remove_item.innerHTML = '<img src="./assets/images/icon-remove-item.svg" alt="icon for removing the items from cart"/>';
+      entry.appendChild(remove_item);
+
       box.appendChild(entry);
-      dessert.cart_entry = entry;
+      dessert.order_entry = entry;
+      dessert.order_entry_detail = detail;
       entry.dessert = dessert;
     }
 
@@ -283,31 +257,23 @@
     return box;
   }
 
-  const populateEntry = (dessert) => {
-      return 
-      `
-        <div class="order-entry">
-          <div class="order-entry-detail">
-            <div class="dessert-name">` + dssert.name + `</div>
-            <div>
-              <span class="order-entry-count">` + dessert.count + `&times</span>
-              <span class="order-entry-price">@ $` + dessert.price.toFixed(2) `</span>
-              <span class="order-entry-subtotal">$` + (dessert.count * dessert.price).toFixed(2)`</span>  
-            </div>
+  const populateEntryDetail = (dessert) => {
+    let price = parseFloat(dessert.price);
+    let total = dessert.count * price;
+    return `
+          <div class="dessert-name">` + dessert.name + `</div>
+          <div>
+            <span class="order-entry-count">` + dessert.count + `&times</span>
+            <span class="order-entry-price">@ $` + dessert.price + `</span>
+            <span class="order-entry-subtotal">$` + total.toFixed(2) + `</span>  
           </div>
-          <div class="remove-item" click="removeEntry(event)">
-            <img src="./assets/images/icon-remove-item.svg"/>
-          </div>
-        </div>
-      `;
+    `;
   }
 
-  const removeEntry = (e) => {
-    console.log(e);
-    const dessert = e.srcNode.dessert;
+  const removeEntry = (dessert) => {
     dessert.count = 0;
     dessert.dirty = true;
-    updateMenue(dessert);
+    updateMenu(dessert);
     updateCart(desserts);
   }
 
