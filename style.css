@@ -30,6 +30,9 @@ main {
     flex-direction: column;
     background-color: hsl(20, 50%, 98%);
 }
+button {
+    border: none;
+}
 
 #dessert-menu {
     flex: 1;
@@ -44,7 +47,7 @@ main {
     font-size: 1em; 
 }
 .dessert-category {
-    margin-top: 2em;
+    margin-top: .25em;
     font-size: 0.8em;
     color: hsl(12, 20%, 44%); 
 }
@@ -59,12 +62,13 @@ main {
 .cart-updator {
     font-size: 0.8em;
     width: 50%;
-    margin: auto;
+    margin: 0 auto;
     position: relative;
     text-align: center;
     border: solid 1px hsl(12, 20%, 44%);
     border-radius: 1.25em;
-    top: -8.25em;
+    /* top: -8.25em; */
+    transform: translateY(-50%);
     overflow: hidden
 }
 .button-empty-container, .button-nonempty-container {
@@ -142,11 +146,12 @@ main {
     padding: 0 0.25em;
 }
 .order-entry-detail {
-    flex: 90%;
+    flex: 1;
 }
 .remove-item {
-    flex: 10%;
+    flex: 0;
     align-self: center;
+    background-color: rgba(255,255,255, 0);
 }
 .remove-item > img {
     display:block;
@@ -300,4 +305,25 @@ main {
     .cart-updator {
         width: 80%;
     }    
+    .modal-body {
+        width: 90%;
+        height: auto;
+        margin: auto;
+    }
+}
+@media only screen and (min-width: 1024px) {
+    main {
+        flex-direction: row;
+    }
+    #dessert-menu {
+        flex: 3;
+    }
+    #cart-area {
+        flex: 1;
+    }
+    .modal-body {
+        width: 50%;
+        height: 50%;
+        margin: auto;
+    }
 }

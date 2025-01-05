@@ -55,7 +55,7 @@
           <p>Order Total</p>
           <p id="modal-order-total-dollars"></p>
         </div>
-        <div id="start-new-order-button" class="start-new-order-button">Start New Order</div>
+        <button id="start-new-order-button" class="start-new-order-button">Start New Order</div>
       </div>
     </div>
   </main>
@@ -70,7 +70,6 @@
   var desserts = [];
   
   window.onload = () => {
-    "use strict";
     getData().then(function(res) {
       //localStorage.removeItem('desserts');
       desserts = res;
@@ -81,26 +80,36 @@
         dessert.dirty = false; //a flag indicating if redraw is needed on its cart entry
       }
       initialize();
-      //alert('in getdata then()');
     });
   }
+  window.onresize = () => {
+    console.log('in onresize()');
+
+    updateMenu(desserts);
+    updateCart(desserts);
+  };
+
+  window.onbeforeunload = function(e) {
+    localStorage.removeItem('desserts');
+    console.log('in onbeforeunload()');
+  };
 
 
   const incrementCount = (dessert)=> {
     dessert.count += 1;
     dessert.dirty = true;
-    updateMenu(dessert);
+    updateMenu(desserts);
     updateCart(desserts);
   }
   const decrementCount = (dessert)=> {
     dessert.count -= 1;
     dessert.dirty = true;
-    updateMenu(dessert);
+    updateMenu(desserts);
     updateCart(desserts);
   }
 
   const buttonWhenEmpty = (dessert) => {
-    const box = document.createElement('div');
+    const box = document.createElement('button');
     box.classList.add('button-empty-container')
     let icon = document.createElement('img');
     icon.classList.add('empty-icon');
@@ -113,11 +122,19 @@
   const buttonWhenNotEmpty = (dessert) => {
     const box = document.createElement('div');
     box.classList.add('button-nonempty-container')
-    let icon = document.createElement('img');
-    icon.src = './assets/images/icon-increment-quantity.svg';
-    icon.classList.add('increment-icon');
-    icon.addEventListener('click', (e)=> { incrementCount(dessert)});
-    box.appendChild(icon);
+
+    let icon1 = document.createElement('img');
+    icon1.src = './assets/images/icon-decrement-quantity.svg';
+    icon1.classList.add('decrement-icon');
+    icon1.setAttribute('tabindex', '0');
+    icon1.addEventListener('click', (e)=> { decrementCount(dessert)});
+    icon1.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        decrementCount(dessert);
+      }
+    });
+    box.appendChild(icon1);
 
     let num = document.createElement('span');     
     num.classList.add('count-num');
@@ -126,25 +143,38 @@
     dessert.num = num; //I am not sure if I want to do this way for updating the count
 
     let icon2 = document.createElement('img');
-    icon2.src = './assets/images/icon-decrement-quantity.svg';
-    icon2.classList.add('decrement-icon');
-    icon2.addEventListener('click', (e)=> { decrementCount(dessert)});
+    icon2.src = './assets/images/icon-increment-quantity.svg';
+    icon2.classList.add('increment-icon');
+    icon2.setAttribute('tabindex', '0');
+    icon2.addEventListener('click', (e)=> { incrementCount(dessert)});
+    icon2.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        incrementCount(dessert);
+      }
+    });
     box.appendChild(icon2);
     return box;
   }
 
-  const updateMenu = (dessert) => {
-    if(dessert.count > 0) {
-      dessert.node.button_empty.style.display = 'none';
-      dessert.node.button_nonempty.style.display = 'flex';
-      dessert.node.photo.style.border = 'solid 1px hsl(14, 86%, 42%)';
-    } else {
-      dessert.node.button_empty.style.display = 'flex';
-      dessert.node.button_nonempty.style.display = 'none';
-      dessert.node.photo.style.border = 'none';
+  const updateMenu = (desserts) => {
+    for(let dessert of desserts)
+    {
+      if(dessert.count > 0) {
+        dessert.node.button_empty.style.display = 'none';
+        dessert.node.button_nonempty.style.display = 'flex';
+        dessert.node.photo.style.border = 'solid 1px hsl(14, 86%, 42%)';
+      } else {
+        dessert.node.button_empty.style.display = 'flex';
+        dessert.node.button_nonempty.style.display = 'none';
+        dessert.node.photo.style.border = 'none';
+      }
+      dessert.num.innerText = '' + dessert.count;
+      if(window.innerWidth <= 450) dessert.node.photo.src = dessert.image.mobile;
+      else if(window.innerWidth < 1024) dessert.node.photo.src = dessert.image.tablet;
+      else dessert.node.photo.src = dessert.image.desktop;
+      localStorage.setItem('desserts', desserts);
     }
-    dessert.num.innerText = '' + dessert.count;
-    localStorage.setItem('desserts', desserts);
   }
   const updateCart = (desserts) => {
     let count = 0;
@@ -176,30 +206,7 @@
     localStorage.setItem('desserts', desserts);
   }
 
-  window.onresize = () => {
-    "use strict";
-    //window.location.reload(); 
-    //let dessertsStored = localStorage.getItem('desserts');
-    //if(dessertsStored) desserts = dessertsStored;
-    console.log('in onresize()');
-
-    initialize();
-  };
-
-  window.onbeforeunload = function(e) {
-    localStorage.removeItem('desserts');
-    console.log('in onbeforeunload()');
-  };
-
   function initialize() {
-    // desserts = await getData();
-    // localStorage.setItem('desserts', desserts);
-
-    // console.log(desserts);
-    // for(let dessert of desserts) {
-    //   dessert.count = 0;
-    //   dessert.dirty = false; //a flag indicating if redraw is needed on its cart entry
-    // }
     initializeMenu(desserts);
 
     const selectedItemsCard = document.getElementById('selected-items-card');
@@ -231,6 +238,17 @@
       photo.appendChild(img);
       item.appendChild(photo);
 
+      //add button
+      let box = document.createElement('div');
+      box.classList.add('cart-updator');
+      let button1 = buttonWhenEmpty(dessert);
+      let button2 = buttonWhenNotEmpty(dessert);
+      button1.style.display = 'flex';
+      button2.style.display = 'none';
+      box.appendChild(button1);
+      box.appendChild(button2);
+      item.appendChild(box);
+
       //add category
       let category = document.createElement('h3');
       category.classList.add('dessert-category');
@@ -246,16 +264,6 @@
       price.classList.add('dessert-price');
       price.appendChild(document.createTextNode('$' + parseFloat(dessert.price).toFixed(2)));
       item.appendChild(price);
-      //add button
-      let box = document.createElement('div');
-      box.classList.add('cart-updator');
-      let button1 = buttonWhenEmpty(dessert);
-      let button2 = buttonWhenNotEmpty(dessert);
-      button1.style.display = 'flex';
-      button2.style.display = 'none';
-      box.appendChild(button1);
-      box.appendChild(button2);
-      item.appendChild(box);
 
       main.appendChild(item);
       //add DOM elements to facilitate visual update
@@ -277,12 +285,15 @@
       detail.classList.add('order-entry-detail');
       detail.innerHTML = populateEntryDetail(dessert);
       entry.appendChild(detail);
-      let remove_item = document.createElement('div');
+      let remove_item = document.createElement('button');
       remove_item.classList.add('remove-item');
       remove_item.addEventListener('click', ()=> {
         removeEntry(dessert);
       });
-      remove_item.innerHTML = '<img src="./assets/images/icon-remove-item.svg" alt="icon for removing the items from cart"/>';
+      let image = document.createElement('img');
+      image.src = "./assets/images/icon-remove-item.svg";
+      image.alt = 'icon for removing ' + dessert.name + ' from cart';
+      remove_item.appendChild(image);
       entry.appendChild(remove_item);
 
       box.appendChild(entry);
@@ -307,7 +318,7 @@
     carbonNeutral.classList.add('carbon-neutral');
     box.appendChild(carbonNeutral);
 
-    const button = document.createElement('div');
+    const button = document.createElement('button');
     button.innerText = 'Confirm Order';
     button.classList.add('order-button');
     box.appendChild(button);
@@ -334,7 +345,7 @@
       for(let dessert of desserts) {
         dessert.count = 0;
         dessert.dirty = true;
-        updateMenu(dessert);
+        updateMenu(desserts);
       }
       updateCart(desserts);
       modal.style.display = 'none';
@@ -387,7 +398,7 @@
   const removeEntry = (dessert) => {
     dessert.count = 0;
     dessert.dirty = true;
-    updateMenu(dessert);
+    updateMenu(desserts);
     updateCart(desserts);
   }
 
