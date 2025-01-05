@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Debugging onload Issue</title>
+</head>
+<body onload="init()">
+
+<script>
+desserts = [];
+let onLoadTriggered = false;
+
+windows.onresize
+
+function init() {
+  console.log('Page loaded');
+  if (!onLoadTriggered) {
+    onLoadTriggered = true;
+    setupResizeHandler();
+    loadData();
+  } else {
+    console.log('onLoad event triggered again');
+  }
+}
+
+function setupResizeHandler() {
+  window.onresize = function() {
+    console.log('Window resized');
+  };
+}
+
+function loadData() {
+  "use strict";
+  getData().then(function(res) {
+    desserts = res;
+    localStorage.setItem('desserts', desserts);
+    console.log('Data loaded:', desserts);
+    for(let dessert of desserts) {
+      dessert.count = 0;
+      dessert.dirty = false;
+    }
+    initialize();
+    alert('in getdata then()');
+  });
+}
+
+function getData() {
+  // Mock function to simulate data loading
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([{name: 'Cake'}, {name: 'Pie'}]);
+    }, 1000);
+  });
+}
+
+function initialize() {
+  console.log('Initialization complete');
+}
+
+</script>
+
+<h1>Resize the window to see the effect</h1>
+
+</body>
+</html>

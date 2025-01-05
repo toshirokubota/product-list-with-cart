@@ -44,6 +44,20 @@
       <div id="selected-items-card">
       </div>
     </div>
+    <div class="modal" id="modal" style="display:none">
+      <div class="modal-backdrop"></div>
+      <div class="modal-body">
+        <img src="./assets/images/icon-order-confirmed.svg" alt="confirmation icon"/>
+        <p class="order-confirmed">Order confirmed</p>
+        <p class="order-confirmed-msg">We hope you enjoy your food</p>
+        <div id="modal-selected-items-card"></div>
+        <div class="modal-order-total">
+          <p>Order Total</p>
+          <p id="modal-order-total-dollars"></p>
+        </div>
+        <div id="start-new-order-button" class="start-new-order-button">Start New Order</div>
+      </div>
+    </div>
   </main>
 
   <div class="attribution">
@@ -53,8 +67,24 @@
 </body>
 
 <script>
-  var desserts;
-  initialize();
+  var desserts = [];
+  
+  window.onload = () => {
+    "use strict";
+    getData().then(function(res) {
+      //localStorage.removeItem('desserts');
+      desserts = res;
+      localStorage.setItem('desserts', desserts);
+      //console.log(desserts);
+      for(let dessert of desserts) {
+        dessert.count = 0;
+        dessert.dirty = false; //a flag indicating if redraw is needed on its cart entry
+      }
+      initialize();
+      //alert('in getdata then()');
+    });
+  }
+
 
   const incrementCount = (dessert)=> {
     dessert.count += 1;
@@ -114,6 +144,7 @@
       dessert.node.photo.style.border = 'none';
     }
     dessert.num.innerText = '' + dessert.count;
+    localStorage.setItem('desserts', desserts);
   }
   const updateCart = (desserts) => {
     let count = 0;
@@ -124,7 +155,7 @@
       if(dessert.dirty) {
         dessert.order_entry_detail.innerHTML = populateEntryDetail(dessert);
         if(dessert.count > 0) {
-          dessert.order_entry.style.display = 'block';
+          dessert.order_entry.style.display = 'flex';
         } else {
           dessert.order_entry.style.display = 'none';
         }
@@ -142,17 +173,49 @@
       document.getElementById('empty-card').style.display = 'none';
       document.getElementById('selected-items-card').style.display = 'block';
     }
+    localStorage.setItem('desserts', desserts);
   }
 
-  async function initialize() {
-    desserts = await getData();
-    console.log(desserts);
-    for(let dessert of desserts) {
-      dessert.count = 0;
-      dessert.dirty = false; //a flag indicating if redraw is needed on its cart entry
-    }
+  window.onresize = () => {
+    "use strict";
+    //window.location.reload(); 
+    //let dessertsStored = localStorage.getItem('desserts');
+    //if(dessertsStored) desserts = dessertsStored;
+    console.log('in onresize()');
+
+    initialize();
+  };
+
+  window.onbeforeunload = function(e) {
+    localStorage.removeItem('desserts');
+    console.log('in onbeforeunload()');
+  };
+
+  function initialize() {
+    // desserts = await getData();
+    // localStorage.setItem('desserts', desserts);
+
+    // console.log(desserts);
+    // for(let dessert of desserts) {
+    //   dessert.count = 0;
+    //   dessert.dirty = false; //a flag indicating if redraw is needed on its cart entry
+    // }
+    initializeMenu(desserts);
+
+    const selectedItemsCard = document.getElementById('selected-items-card');
+    //console.log(selectedItemsCard);
+    const cart = initializeCart(desserts);
+    selectedItemsCard.appendChild(cart);
+    selectedItemsCard.style.display = 'none';
+
+    const modalItemsCard = document.getElementById('modal-selected-items-card');
+    const modalBox = initializeModalItems(desserts);
+    modalItemsCard.appendChild(modalBox);
+  }
+  const initializeMenu = (desserts) => {
     let main = document.getElementById('dessert-menu');
     for(let dessert of desserts) {
+      console.log(dessert);
       let item = document.createElement('div');
       item.classList.add('dessert-item');
       //add photo
@@ -161,6 +224,7 @@
       let img = document.createElement('img');
       img.alt = 'picture of ' + dessert.name;
       //add thumb nail photo based on the screen size
+      //console.log('inner width' + window.innerWidth);
       if(window.innerWidth <= 450) img.src = dessert.image.mobile;
       else if(window.innerWidth < 1024) img.src = dessert.image.tablet;
       else img.src = dessert.image.desktop;
@@ -197,12 +261,6 @@
       //add DOM elements to facilitate visual update
       dessert.node = { button_empty: button1, button_nonempty: button2, box: box, photo: img};
     }
-
-    const selectedItemsCard = document.getElementById('selected-items-card');
-    console.log(selectedItemsCard);
-    const cart = initializeCart(desserts);
-    selectedItemsCard.appendChild(cart);
-    selectedItemsCard.style.display = 'none';
   }
 
   const initializeCart = (desserts) => {
@@ -251,9 +309,50 @@
 
     const button = document.createElement('div');
     button.innerText = 'Confirm Order';
-    button.classList.add('comfirm-order-button');
+    button.classList.add('order-button');
     box.appendChild(button);
+    const modal = document.getElementById('modal');
+    button.addEventListener('click', ()=>{
+      let total = 0;
+      for(let dessert of desserts) {
+        //console.log(dessert);
+        if(dessert.count == 0) {
+          dessert.modal_entry.style.display = 'none';
+        }
+        else {
+          dessert.modal_entry.innerHTML = populateEntryDetailForModal(dessert);
+          dessert.modal_entry.style.display = 'grid';
+          total += dessert.price * dessert.count;
+        }
+      }
+      document.getElementById('modal-order-total-dollars').innerText = '$' + total.toFixed(2);
+      modal.style.display = 'block';
+    });
+    const button2 = document.getElementById('start-new-order-button');
+    button2.addEventListener('click', ()=>{
+      //clear the order
+      for(let dessert of desserts) {
+        dessert.count = 0;
+        dessert.dirty = true;
+        updateMenu(dessert);
+      }
+      updateCart(desserts);
+      modal.style.display = 'none';
+    })
 
+    return box;
+  }
+
+  const initializeModalItems = (desserts) => {
+    const box = document.createElement('div');
+    box.classList.add('modal-selected-items-box');
+    for(let dessert of desserts) {
+      const entry = document.createElement('div');
+      entry.classList.add('modal-item-entry')
+      entry.innerHTML = populateEntryDetailForModal(dessert);
+      box.appendChild(entry);
+      dessert.modal_entry = entry;
+    }
     return box;
   }
 
@@ -267,6 +366,21 @@
             <span class="order-entry-price">@ $` + dessert.price + `</span>
             <span class="order-entry-subtotal">$` + total.toFixed(2) + `</span>  
           </div>
+    `;
+  }
+  const populateEntryDetailForModal = (dessert) => {
+    let price = parseFloat(dessert.price);
+    let total = dessert.count * price;
+    return `
+      <div class="dessert-thumbnail">` + `
+        <img src=` + dessert.image.thumbnail + ` alt="thumbnail of ` + dessert.name + `"/>
+      </div>
+      <span class="dessert-name">` + dessert.name + `</span>
+      <p class="dessert-modal-entry-price">
+        <span class="order-entry-count">` + dessert.count + `&times</span>
+        <span class="order-entry-price">@ $` + dessert.price + `</span>
+      </p>
+      <span class="order-entry-subtotal">$` + total.toFixed(2) + `</span>  
     `;
   }
 
