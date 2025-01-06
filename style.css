@@ -33,6 +33,9 @@ main {
 button {
     border: none;
 }
+button:hover {
+    cursor: pointer;
+}
 
 #dessert-menu {
     flex: 1;
@@ -103,6 +106,9 @@ button {
     padding: 0.25em;
     border: solid 1px white; 
     border-radius: 0.75em;
+}
+.button-nonempty-container img:hover {
+    cursor: pointer;
 }
 #empty-card {
     width: 100%;
