@@ -1,64 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Debugging onload Issue</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centered Children</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Center children horizontally */
+            /*align-items: center; /* Optional: Center children vertically */
+            height: 200px; /* Example height */
+            border: 1px solid #ccc; /* Example border */
+        }
+        .child {
+            width: 100px; /* Example width */
+            height: 100px; /* Example height */
+            background-color: lightblue; /* Example background */
+            margin: 10px; /* Example spacing */
+        }
+    </style>
 </head>
-<body onload="init()">
-
-<script>
-desserts = [];
-let onLoadTriggered = false;
-
-windows.onresize
-
-function init() {
-  console.log('Page loaded');
-  if (!onLoadTriggered) {
-    onLoadTriggered = true;
-    setupResizeHandler();
-    loadData();
-  } else {
-    console.log('onLoad event triggered again');
-  }
-}
-
-function setupResizeHandler() {
-  window.onresize = function() {
-    console.log('Window resized');
-  };
-}
-
-function loadData() {
-  "use strict";
-  getData().then(function(res) {
-    desserts = res;
-    localStorage.setItem('desserts', desserts);
-    console.log('Data loaded:', desserts);
-    for(let dessert of desserts) {
-      dessert.count = 0;
-      dessert.dirty = false;
-    }
-    initialize();
-    alert('in getdata then()');
-  });
-}
-
-function getData() {
-  // Mock function to simulate data loading
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([{name: 'Cake'}, {name: 'Pie'}]);
-    }, 1000);
-  });
-}
-
-function initialize() {
-  console.log('Initialization complete');
-}
-
-</script>
-
-<h1>Resize the window to see the effect</h1>
-
+<body>
+    <div class="container">
+        <div class="child">Child 1</div>
+        <div class="child">Child 2</div>
+        <div class="child">Child 3</div>
+    </div>
 </body>
 </html>

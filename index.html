@@ -31,17 +31,19 @@
   <main>
     <div id="dessert-menu">
     </div>
-    <div id="cart-area">
-      <h4 id="cart-summary">
-        Your Cart (0)
-      </h4>
-      <div id="empty-card">
-        <div class="empty-cart-icon">
-          <img src="./assets/images/illustration-empty-cart.svg"/>
-          Your added items will appear here
-        </div>    
-      </div>
-      <div id="selected-items-card">
+    <div class="cart-container">
+      <div id="cart-area">
+        <h4 id="cart-summary">
+          Your Cart (0)
+        </h4>
+        <div id="empty-card">
+          <div class="empty-cart-icon">
+            <img src="./assets/images/illustration-empty-cart.svg"/>
+          </div>    
+          <div>Your added items will appear here</div>
+        </div>
+        <div id="selected-items-card">
+        </div>
       </div>
     </div>
     <div class="modal" id="modal" style="display:none">
@@ -73,7 +75,7 @@
     getData().then(function(res) {
       //localStorage.removeItem('desserts');
       desserts = res;
-      localStorage.setItem('desserts', desserts);
+      //localStorage.setItem('desserts', desserts);
       //console.log(desserts);
       for(let dessert of desserts) {
         dessert.count = 0;
@@ -90,7 +92,7 @@
   };
 
   window.onbeforeunload = function(e) {
-    localStorage.removeItem('desserts');
+    //localStorage.removeItem('desserts');
     console.log('in onbeforeunload()');
   };
 
@@ -110,13 +112,17 @@
 
   const buttonWhenEmpty = (dessert) => {
     const box = document.createElement('button');
+    box.setAttribute('type', 'button');
     box.classList.add('button-empty-container')
     let icon = document.createElement('img');
     icon.classList.add('empty-icon');
     icon.src = './assets/images/icon-add-to-cart.svg';
+    icon.alt = 'icon depicting an empty cart';
     box.addEventListener('click', (e)=> { incrementCount(dessert)});
-    box.appendChild(document.createTextNode('Add to Cart'));
+    let span = document.createElement('span');
+    span.innerText = 'Add to Cart';
     box.appendChild(icon);
+    box.appendChild(span);
     return box;
   }
   const buttonWhenNotEmpty = (dessert) => {
@@ -173,7 +179,7 @@
       if(window.innerWidth <= 450) dessert.node.photo.src = dessert.image.mobile;
       else if(window.innerWidth < 1024) dessert.node.photo.src = dessert.image.tablet;
       else dessert.node.photo.src = dessert.image.desktop;
-      localStorage.setItem('desserts', desserts);
+      //localStorage.setItem('desserts', desserts);
     }
   }
   const updateCart = (desserts) => {
@@ -197,13 +203,13 @@
     let summary = document.getElementById('cart-summary');
     summary.innerText = 'Your Cart (' + count + ')';
     if(count == 0) {
-      document.getElementById('empty-card').style.display = 'block';
+      document.getElementById('empty-card').style.display = 'flex';
       document.getElementById('selected-items-card').style.display = 'none';
     } else {
       document.getElementById('empty-card').style.display = 'none';
       document.getElementById('selected-items-card').style.display = 'block';
     }
-    localStorage.setItem('desserts', desserts);
+    //localStorage.setItem('desserts', desserts);
   }
 
   function initialize() {
