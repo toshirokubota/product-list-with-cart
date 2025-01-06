@@ -25,20 +25,22 @@
 </head>
 
 <body>
-  <h1>
-    Desserts
-  </h1>
+  <header>
+    <h1>
+      Desserts
+    </h1>
+  </header>
   <main>
     <div id="dessert-menu">
     </div>
     <div class="cart-container">
       <div id="cart-area">
-        <h4 id="cart-summary">
+        <div id="cart-summary">
           Your Cart (0)
-        </h4>
+        </div>
         <div id="empty-card">
           <div class="empty-cart-icon">
-            <img src="./assets/images/illustration-empty-cart.svg"/>
+            <img src="./assets/images/illustration-empty-cart.svg" alt="empty cart icon"/>
           </div>    
           <div>Your added items will appear here</div>
         </div>
@@ -61,11 +63,12 @@
       </div>
     </div>
   </main>
-
-  <div class="attribution">
-    Challenge by <a href="https://www.frontendmentor.io?ref=challenge">Frontend Mentor</a>.
-    Coded by <a href="#">Your Name Here</a>.
-  </div>
+  <footer>
+    <div class="attribution">
+      Challenge by <a href="https://www.frontendmentor.io?ref=challenge">Frontend Mentor</a>.
+      Coded by <a href="#">Your Name Here</a>.
+    </div>
+  </footer>
 </body>
 
 <script>
@@ -256,12 +259,12 @@
       item.appendChild(box);
 
       //add category
-      let category = document.createElement('h3');
+      let category = document.createElement('div');
       category.classList.add('dessert-category');
       category.appendChild(document.createTextNode(dessert.category));
       item.appendChild(category);
       //add name 
-      let name = document.createElement('h2');
+      let name = document.createElement('div');
       name.appendChild(document.createTextNode(dessert.name));
       name.classList.add('dessert-name');
       item.appendChild(name);
